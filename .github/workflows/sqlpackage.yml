@@ -55,18 +55,9 @@ jobs:
       run: |
         ./sqlpackage/sqlpackage.exe /Action:Script `
           /SourceFile:"bin\Release\SqlPipeline.dacpac" `
-          /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
+          /TargetDatabaseName:"${{ secrets.SQL_DATABASE }}" `
           /OutputPath:"deploy.sql"
-      shell: pwsh
-
-    - name: Generate deploy.sql from DACPAC
-      run: |
-        "C:\Program Files\Microsoft SQL Server\160\DAC\bin\SqlPackage.exe" `
-          /Action:Script `
-          /SourceFile:"SqlPipeline\bin\Release\SqlPipeline.dacpac" `
-          /TargetDatabaseName:${{ secrets.SQL_DB }} `
-          /OutputPath:"deploy.sql"
-      shell: powershell
+      shell: pwsh   
 
     - name: Run deploy.sql using sqlcmd
       run: |
