@@ -1,24 +1,95 @@
-name: Deploy SQL Server Scripts
+# name: Deploy SQL Server Scripts
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: windows-latest
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Install SQL Server Command Line Tools
+#       run: |
+#         choco install sqlcmd -y
+
+#     - name: Run SQL Scripts using sqlcmd
+#       run: |
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_tables.sql"
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql"
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql"
+
+
+name: Build & Deploy SQL Server Project
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  deploy:
+  deploy-sql:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Install SQL Server Command Line Tools
-      run: |
-        choco install sqlcmd -y
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3.1
 
-    - name: Run SQL Scripts using sqlcmd
+    - name: Build SQL Project (.sqlproj)
       run: |
-        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_tables.sql"
-        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql"
-        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql"
+        msbuild src\YourDatabaseProject\YourDatabaseProject.sqlproj /p:Configuration=Release
+
+    - name: Install SqlPackage
+      run: |
+        Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-msi" -OutFile sqlpackage.msi
+        Start-Process msiexec.exe -ArgumentList '/i', 'sqlpackage.msi', '/quiet', '/qn' -Wait
+      shell: powershell
+
+    - name: Generate deploy.sql from DACPAC
+      run: |
+        "C:\Program Files\Microsoft SQL Server\160\DAC\bin\SqlPackage.exe" `
+          /Action:Script `
+          /SourceFile:"src\YourDatabaseProject\bin\Release\YourDatabaseProject.dacpac" `
+          /TargetDatabaseName:${{ secrets.SQL_DATABASE }} `
+          /OutputPath:"deploy.sql"
+      shell: powershell
+
+    - name: Run deploy.sql using sqlcmd
+      run: |
+        sqlcmd -S "${{ secrets.SQL_SERVER }}" `
+               -d "${{ secrets.SQL_DB }}" `
+               -U "${{ secrets.SQL_USER }}" `
+               -P "${{ secrets.SQL_PASSWORD }}" `
+               -i "deploy.sql"
+
+
+# name: Deploy SQL Server Scripts
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: windows-latest
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Install SQL Server Command Line Tools
+#       run: |
+#         choco install sqlcmd -y
+
+#     - name: Run SQL Scripts using sqlcmd
+#       run: |
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_tables.sql"
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql"
+#         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql"
