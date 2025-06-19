@@ -51,14 +51,12 @@ jobs:
         Expand-Archive -Path "sqlpackage.zip" -DestinationPath "sqlpackage"
       shell: pwsh
 
-    - name: Generate deploy.sql from DACPAC
+    - name: Extract DACPAC as SQL scripts
       run: |
         ./sqlpackage/sqlpackage.exe /Action:Extract `
-          /SourceFile:"bin\Release\SqlPipeline.dacpac" `
           /TargetServerName:"localhost" `
-          /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
-          /OutputPath:"deploy.sql"
-      shell: pwsh
+          /TargetDatabaseName:"Dummy" `
+          /OutputPath:"deploy.dacpac"
 
     - name: Run deploy.sql using sqlcmd
       run: |
