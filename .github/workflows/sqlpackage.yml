@@ -55,6 +55,7 @@ jobs:
       run: |
         ./sqlpackage/sqlpackage.exe /Action:Script `
           /SourceFile:"bin\Release\SqlPipeline.dacpac" `
+          /TargetServerName:"localhost" `
           /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
           /OutputPath:"deploy.sql"
       shell: pwsh
