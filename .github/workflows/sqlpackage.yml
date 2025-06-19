@@ -23,15 +23,14 @@
 #         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql"
 #         cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql"
 
-
-name: Build & Deploy SQL Server Project
+name: Build & Deploy SQL Project to SQL Server
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy-sql:
+  deploy:
     runs-on: windows-latest
 
     steps:
@@ -41,7 +40,7 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.3.1
 
-    - name: Build SQL Project (.sqlproj)
+    - name: Build SQL Project
       run: |
         msbuild SqlPipeline.sqlproj /p:Configuration=Release
 
@@ -51,21 +50,15 @@ jobs:
         Expand-Archive -Path "sqlpackage.zip" -DestinationPath "sqlpackage"
       shell: pwsh
 
-    - name: Extract DACPAC as SQL scripts
+    - name: Deploy .dacpac to SQL Server
       run: |
-        ./sqlpackage/sqlpackage.exe /Action:Extract `
-          /TargetServerName:"localhost" `
-          /TargetDatabaseName:"Dummy" `
-          /OutputPath:"deploy.dacpac"
-
-    - name: Run deploy.sql using sqlcmd
-      run: |
-        sqlcmd -S "${{ secrets.SQL_SERVER }}" `
-               -d "${{ secrets.SQL_DB }}" `
-               -U "${{ secrets.SQL_USER }}" `
-               -P "${{ secrets.SQL_PASSWORD }}" `
-               -i "deploy.sql"
-
+        ./sqlpackage/sqlpackage.exe /Action:Publish `
+          /SourceFile:"bin\Release\SqlPipeline.dacpac" `
+          /TargetServerName:"${{ secrets.SQL_SERVER }}" `
+          /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
+          /TargetUser:"${{ secrets.SQL_USER }}" `
+          /TargetPassword:"${{ secrets.SQL_PASSWORD }}"
+      shell: pwsh
 
 # name: Deploy SQL Server Scripts
 
