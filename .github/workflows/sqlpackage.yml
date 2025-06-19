@@ -51,16 +51,17 @@ jobs:
       shell: pwsh
 
     - name: Deploy .dacpac to SQL Server
+      shell: pwsh
       run: |
-        ./sqlpackage/sqlpackage.exe /Action:Publish `
+        $sqlpackage = "./sqlpackage/sqlpackage.exe"
+        & $sqlpackage /Action:Publish `
           /SourceFile:"bin\Release\SqlPipeline.dacpac" `
           /TargetServerName:"${{ secrets.SQL_SERVER }}" `
           /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
           /TargetUser:"${{ secrets.SQL_USER }}" `
-          /TargetPassword:"${{ secrets.SQL_PASSWORD }}"
+          /TargetPassword:"${{ secrets.SQL_PASSWORD }}" `
           /EncryptConnection:True `
           /TrustServerCertificate:True
-      shell: pwsh
 
 # name: Deploy SQL Server Scripts
 
