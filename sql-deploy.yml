@@ -19,6 +19,6 @@ jobs:
 
     - name: Run SQL Scripts using sqlcmd
       run: |
-        sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_tables.sql
-        sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql
-        sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql
+        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_tables.sql"
+        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_views.sql"
+        cmd /c "sqlcmd -S ${{ secrets.SQL_SERVER }} -d ${{ secrets.SQL_DB }} -U ${{ secrets.SQL_USER }} -P ${{ secrets.SQL_PASSWORD }} -i scripts/create_procedures.sql"

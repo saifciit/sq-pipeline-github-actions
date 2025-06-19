@@ -75,4 +75,7 @@
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeAttendance.sql" />
     <Build Include="dbo\Stored Procedures\sp_AddNewEmployee.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="sql-deploy.yml" />
+  </ItemGroup>
 </Project>
