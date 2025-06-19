@@ -43,7 +43,7 @@ jobs:
 
     - name: Build SQL Project (.sqlproj)
       run: |
-        msbuild src\YourDatabaseProject\YourDatabaseProject.sqlproj /p:Configuration=Release
+        msbuild src\SqlPipeline.sqlproj /p:Configuration=Release
 
     - name: Install SqlPackage
       run: |
