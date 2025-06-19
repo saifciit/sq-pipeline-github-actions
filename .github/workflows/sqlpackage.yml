@@ -51,6 +51,7 @@ jobs:
         Expand-Archive -Path "sqlpackage.zip" -DestinationPath "sqlpackage"
       shell: pwsh
 
+
     - name: Generate deploy.sql from DACPAC
       run: |
         ./sqlpackage/sqlpackage.exe /Action:Script `
