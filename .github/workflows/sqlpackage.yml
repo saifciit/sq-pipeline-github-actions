@@ -53,7 +53,7 @@ jobs:
 
     - name: Generate deploy.sql from DACPAC
       run: |
-        ./sqlpackage/sqlpackage.exe /Action:Script `
+        ./sqlpackage/sqlpackage.exe /Action:Extract `
           /SourceFile:"bin\Release\SqlPipeline.dacpac" `
           /TargetServerName:"localhost" `
           /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
