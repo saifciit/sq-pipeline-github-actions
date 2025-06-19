@@ -58,6 +58,8 @@ jobs:
           /TargetDatabaseName:"${{ secrets.SQL_DB }}" `
           /TargetUser:"${{ secrets.SQL_USER }}" `
           /TargetPassword:"${{ secrets.SQL_PASSWORD }}"
+          /EncryptConnection:True `
+          /TrustServerCertificate:True
       shell: pwsh
 
 # name: Deploy SQL Server Scripts
