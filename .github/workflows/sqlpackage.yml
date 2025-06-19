@@ -43,7 +43,7 @@ jobs:
 
     - name: Build SQL Project (.sqlproj)
       run: |
-        msbuild src\SqlPipeline.sqlproj /p:Configuration=Release
+        msbuild SqlPipeline.sqlproj /p:Configuration=Release
 
     - name: Install SqlPackage
       run: |
@@ -55,7 +55,7 @@ jobs:
       run: |
         "C:\Program Files\Microsoft SQL Server\160\DAC\bin\SqlPackage.exe" `
           /Action:Script `
-          /SourceFile:"src\SqlPipeline\bin\Release\SqlPipeline.dacpac" `
+          /SourceFile:"SqlPipeline\bin\Release\SqlPipeline.dacpac" `
           /TargetDatabaseName:${{ secrets.SQL_DATABASE }} `
           /OutputPath:"deploy.sql"
       shell: powershell
